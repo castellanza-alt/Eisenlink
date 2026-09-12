@@ -1,6 +1,9 @@
 {
+  "id": "eisenlink-helper",
   "name": "Eisenlink helper",
   "short_name": "Eisenlink",
+  "description": "Scegli il peso, vedi quali piastre montare sul manubrio componibile Eisenlink.",
+  "lang": "it",
   "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",
