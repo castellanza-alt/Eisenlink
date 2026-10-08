@@ -12,9 +12,9 @@ enum Materials {
     }
 
     // Colori e valori dal file di riferimento (reference/index.html), non dalla tabella del handoff.
-    static func fixed() -> SCNMaterial { pbr(0x090B0D, rough: 0.60, metal: 0.28) }
-    static func big() -> SCNMaterial { pbr(0x141719, rough: 0.52, metal: 0.34) }
-    static func small() -> SCNMaterial { pbr(0x1C2023, rough: 0.46, metal: 0.38) }
+    static func fixed() -> SCNMaterial { pbr(0x0B0D0F, rough: 0.58, metal: 0.28) }
+    static func big() -> SCNMaterial { pbr(0x15191B, rough: 0.50, metal: 0.34) }
+    static func small() -> SCNMaterial { pbr(0x22282B, rough: 0.44, metal: 0.38) }
     static func shaft() -> SCNMaterial { pbr(0x8D9296, rough: 0.26, metal: 0.95) }
     static func chrome() -> SCNMaterial { pbr(0xDFE2E4, rough: 0.09, metal: 1.0) }
 
@@ -31,9 +31,9 @@ enum Materials {
         let r = UIGraphicsImageRenderer(size: CGSize(width: 128, height: 8))
         // Nel riferimento il colore 0x2A2E31 moltiplica una mappa grigia (0x8D base, 0x4A righe): qui è già moltiplicato.
         return r.image { ctx in
-            UIColor(hex: 0x17191B).setFill()
+            UIColor(hex: 0x202326).setFill()
             ctx.fill(CGRect(x: 0, y: 0, width: 128, height: 8))
-            UIColor(hex: 0x0C0D0E).setFill()
+            UIColor(hex: 0x111314).setFill()
             var x: CGFloat = 0
             while x < 128 { ctx.fill(CGRect(x: x, y: 0, width: 1.4, height: 8)); x += 3 }
         }

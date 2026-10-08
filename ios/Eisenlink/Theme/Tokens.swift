@@ -1,6 +1,8 @@
 import SwiftUI
 import UIKit
 
+/// Palette: grafite verdastro (scuro) e avorio (chiaro), mai nero o bianco assoluti.
+/// Il lime del marchio compare solo dove c'è una selezione.
 enum Tokens {
     private static func dyn(_ light: UInt32, _ dark: UInt32, _ la: Double = 1, _ da: Double = 1) -> Color {
         Color(uiColor: UIColor { tc in
@@ -9,20 +11,16 @@ enum Tokens {
         })
     }
 
-    static let bg = dyn(0xEFEDE8, 0x232420)
-    static let blob1 = dyn(0xE3E0D6, 0x2E302A)
-    static let blob2 = dyn(0xDCE2DC, 0x2A322D)
-    static let blob3 = dyn(0xE8E3DA, 0x33322B)
-    static let glass = dyn(0xFFFFFF, 0xFFFFFF, 0.46, 0.07)
-    static let line = dyn(0xFFFFFF, 0xFFFFFF, 0.72, 0.16)
-    static let ink = dyn(0x1A1A18, 0xEDEBE4)
-    static let muted = dyn(0x1A1A18, 0xEDEBE4, 0.48, 0.50)
-    static let accent = dyn(0x1E4636, 0x8FBFA6)
-    static let accent2 = dyn(0x2C6249, 0x6FA88C)
-    static let onAccent = dyn(0xF4F2EC, 0x16241D)
-    static let mark = dyn(0x8A6A3B, 0xC4A472)
-    static let shadow = dyn(0x28261F, 0x000000, 0.13, 0.40)
-    static let chipShadow = dyn(0x28261F, 0x000000, 0.07, 0.25)
+    static let bg = dyn(0xE8E7E1, 0x1B2624)
+    static let glow = dyn(0xF3F2ED, 0x2B403B)
+    static let card = dyn(0xF1F0EB, 0xF1F3EF, 1, 0.06)
+    static let line = dyn(0x1B201D, 0xF1F3EF, 0.08, 0.10)
+    static let ink = dyn(0x1B201D, 0xF1F3EF)
+    static let muted = dyn(0x1B201D, 0xF1F3EF, 0.55, 0.55)
+    static let sel = dyn(0x161B18, 0xBDE955)
+    static let onSel = dyn(0xC6F060, 0x11190A)
+    static let mark = dyn(0x9A7A3C, 0xB9955A)
+    static let floorShadow = dyn(0x1E221C, 0x000000, 0.22, 0.45)
 
     static let wide = "Archivo-SemiExpandedSemiBold"
     static let medium = "Archivo-Medium"
@@ -46,8 +44,8 @@ extension Font {
 
 extension Text {
     /// Maiuscoletto spaziato (em = frazione del corpo).
-    func label(_ size: CGFloat, em: CGFloat, color: Color = Tokens.muted, medium: Bool = true) -> some View {
-        self.font(medium ? .medium(size) : .regular(size))
+    func label(_ size: CGFloat, em: CGFloat, color: Color = Tokens.muted) -> some View {
+        self.font(.medium(size))
             .tracking(size * em)
             .foregroundStyle(color)
             .textCase(.uppercase)

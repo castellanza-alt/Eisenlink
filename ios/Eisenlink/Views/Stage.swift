@@ -1,92 +1,96 @@
 import SwiftUI
 
+/// Manubrio a tutta larghezza con il peso in grande in alto a sinistra.
 struct Stage: View {
     @Environment(AppState.self) private var state
     @Environment(\.scenePhase) private var phase
 
     var body: some View {
         let cfg = state.config
-        VStack(spacing: 0) {
-            HStack(alignment: .bottom, spacing: 10) {
-                Text("\(cfg.w)")
-                    .font(.wide(72))
-                    .tracking(-72 * 0.035)
-                    .monospacedDigit()
-                    .foregroundStyle(Tokens.ink)
-                    .frame(height: 61, alignment: .bottom)
-                Text(state.mode.unitLabel)
-                    .label(10, em: 0.2)
-                    .padding(.bottom, 9)
-                Spacer(minLength: 0)
-            }
-            .allowsHitTesting(false)
-            .zIndex(2)
-            .accessibilityElement(children: .combine)
-
+        ZStack(alignment: .topLeading) {
             ZStack(alignment: .bottom) {
-                RadialGradient(colors: [Color(red: 0.12, green: 0.11, blue: 0.09).opacity(0.26), .clear],
-                               center: .center, startRadius: 0, endRadius: 80)
-                    .frame(height: 20)
-                    .padding(.horizontal, 54)
-                    .padding(.bottom, 40)
+                RadialGradient(colors: [Tokens.floorShadow, .clear],
+                               center: .center, startRadius: 0, endRadius: 90)
+                    .frame(height: 26)
+                    .padding(.horizontal, 56)
+                    .padding(.bottom, 10)
                     .allowsHitTesting(false)
                 DumbbellView(config: cfg, wide: state.mode == .solo, active: phase == .active)
             }
-            .frame(height: 236)
-            .padding(.top, -44)
-            .padding(.bottom, -20)
-            .zIndex(1)
+            .padding(.top, 70)
 
-            PerSide(config: cfg)
-                .zIndex(2)
-        }
-        .padding(.top, 20).padding(.horizontal, 20).padding(.bottom, 16)
-        .overlay(alignment: .topTrailing) {
+            VStack(alignment: .leading, spacing: 10) {
+                Text("\(cfg.w)")
+                    .font(.wide(124))
+                    .tracking(-124 * 0.035)
+                    .monospacedDigit()
+                    .foregroundStyle(Tokens.ink)
+                    .frame(height: 100, alignment: .bottom)
+                Text(state.mode.unitLabel).label(10.5, em: 0.16)
+            }
+            .padding(.leading, 8)
+            .padding(.top, 14)
+            .allowsHitTesting(false)
+            .accessibilityElement(children: .combine)
+
             Text("un manubrio")
-                .label(9, em: 0.16, color: Tokens.mark)
+                .label(9.5, em: 0.16, color: Tokens.mark)
                 .padding(.vertical, 5).padding(.horizontal, 10)
                 .overlay(Capsule().strokeBorder(Tokens.mark, lineWidth: 1))
-                .padding(20)
+                .frame(maxWidth: .infinity, alignment: .topTrailing)
+                .padding(.top, 22)
+                .padding(.trailing, 6)
                 .opacity(state.mode == .solo && Kit.needsExtraKit(cfg) ? 1 : 0)
                 .animation(.easeOut(duration: 0.2), value: cfg)
                 .allowsHitTesting(false)
         }
-        .glass(RoundedRectangle(cornerRadius: 26, style: .continuous))
+        .frame(maxHeight: .infinity)
+        .frame(minHeight: 300)
     }
 }
 
-struct PerSide: View {
+/// Piastre da montare per lato, con i nomi «Grande» (2 kg) e «Piccola» (1 kg).
+struct LoadRow: View {
     let config: Config
 
     var body: some View {
-        let has = config.big > 0 || config.small > 0
-        VStack(spacing: 9) {
-            Text("per lato")
-                .label(9, em: 0.22)
-                .opacity(has ? 1 : 0)
-            if has {
-                HStack(spacing: 30) {
-                    if config.big > 0 { group(width: 15, count: config.big, kg: 2) }
-                    if config.small > 0 { group(width: 9, count: config.small, kg: 1) }
-                }
-            } else {
-                Text("nessuna piastra").label(11, em: 0.16)
+        HStack(spacing: 10) {
+            if config.big > 0 {
+                card(width: 14, height: 42, count: config.big, name: config.big == 1 ? "Grande" : "Grandi", kg: 2)
+            }
+            if config.small > 0 {
+                card(width: 8, height: 36, count: config.small, name: config.small == 1 ? "Piccola" : "Piccole", kg: 1)
+            }
+            if config.big == 0 && config.small == 0 {
+                Text("Nessuna piastra, solo maniglia e viti")
+                    .label(10.5, em: 0.12)
+                    .frame(maxWidth: .infinity, minHeight: 66)
+                    .background(Tokens.card, in: RoundedRectangle(cornerRadius: 18, style: .continuous))
+                    .overlay(RoundedRectangle(cornerRadius: 18, style: .continuous).strokeBorder(Tokens.line, lineWidth: 1))
             }
         }
-        .frame(maxWidth: .infinity, minHeight: 66)
-        .accessibilityElement(children: .combine)
+        .frame(minHeight: 66)
+        .animation(.easeOut(duration: 0.18), value: config)
     }
 
-    private func group(width: CGFloat, count: Int, kg: Int) -> some View {
-        HStack(spacing: 10) {
-            RoundedRectangle(cornerRadius: 3).fill(Tokens.ink).opacity(0.88)
-                .frame(width: width, height: 40)
-            VStack(alignment: .leading, spacing: 6) {
-                Text("\(count)")
-                    .font(.wide(26)).tracking(-26 * 0.03).monospacedDigit()
-                    .foregroundStyle(Tokens.ink)
-                Text("× \(kg) kg").label(9, em: 0.16)
+    private func card(width: CGFloat, height: CGFloat, count: Int, name: String, kg: Int) -> some View {
+        HStack(spacing: 12) {
+            RoundedRectangle(cornerRadius: 3).fill(Tokens.ink)
+                .frame(width: width, height: height)
+            VStack(alignment: .leading, spacing: 3) {
+                Text("\(count) \(name)").font(.medium(15)).foregroundStyle(Tokens.ink)
+                Text("\(kg) kg l’una").font(.regular(11.5)).foregroundStyle(Tokens.muted)
             }
+            Spacer(minLength: 0)
+            Text("×\(count)")
+                .font(.wide(34)).tracking(-34 * 0.03).monospacedDigit()
+                .foregroundStyle(Tokens.ink)
         }
+        .padding(.horizontal, 14).padding(.vertical, 11)
+        .frame(maxWidth: .infinity, minHeight: 66)
+        .background(Tokens.card, in: RoundedRectangle(cornerRadius: 18, style: .continuous))
+        .overlay(RoundedRectangle(cornerRadius: 18, style: .continuous).strokeBorder(Tokens.line, lineWidth: 1))
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel("\(count) \(name), \(kg) chili l’una, per lato")
     }
 }

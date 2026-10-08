@@ -74,7 +74,7 @@ final class DumbbellScene: NSObject, SCNSceneRendererDelegate {
         v.onLayout = { [weak self] in self?.updateCamera() }
 
         scene.lightingEnvironment.contents = Materials.environment()
-        scene.lightingEnvironment.intensity = 1.0
+        scene.lightingEnvironment.intensity = 0.8
 
         let cam = SCNCamera()
         cam.fieldOfView = 28
@@ -88,7 +88,7 @@ final class DumbbellScene: NSObject, SCNSceneRendererDelegate {
         amb.light!.intensity = 180; amb.light!.color = UIColor.white
         scene.rootNode.addChildNode(amb)
         scene.rootNode.addChildNode(directional(at: SCNVector3(3, 5, 4), intensity: 900))
-        scene.rootNode.addChildNode(directional(at: SCNVector3(-4, 1, -3), intensity: 350))
+        scene.rootNode.addChildNode(directional(at: SCNVector3(-4, 1.5, -3), intensity: 700))
 
         scene.rootNode.addChildNode(root)
         let bar = Geometry.cylinderX(radius: Dim.barR, length: Dim.barHalf * 2, material: Materials.bar(), segments: 28)
@@ -147,7 +147,7 @@ final class DumbbellScene: NSObject, SCNSceneRendererDelegate {
             }
             for _ in 0..<c.small {
                 x += d * Dim.tSmall / 2
-                add(gSmall, at: x, animateFrom: animate ? d * 0.9 : nil)
+                add(gSmall, at: x, scale: 0.88, animateFrom: animate ? d * 0.9 : nil)
                 x += d * (Dim.tSmall / 2 + Dim.gap)
             }
             if c.screw > 0 {
@@ -161,7 +161,7 @@ final class DumbbellScene: NSObject, SCNSceneRendererDelegate {
         }
     }
 
-    private func add(_ g: SCNGeometry, at x: CGFloat, animateFrom offset: CGFloat? = nil) {
+    private func add(_ g: SCNGeometry, at x: CGFloat, scale: Float = 1, animateFrom offset: CGFloat? = nil) {
         // Il guscio ruota di 90° attorno a Y: la lastra (estrusa su Z) ha lo spessore lungo X.
         let shell = SCNNode()
         shell.name = "piece"
@@ -169,6 +169,8 @@ final class DumbbellScene: NSObject, SCNSceneRendererDelegate {
         let body = SCNNode(geometry: g)
         let depth = ((g as? SCNShape)?.extrusionDepth ?? 0)
         body.position.z = Float(-depth / 2)
+        // Le piastre Piccole sono un po' più piccole in larghezza e altezza, non nello spessore.
+        shell.scale = SCNVector3(scale, scale, 1)
         shell.addChildNode(body)
         shell.position.x = Float(x + (offset ?? 0))
         root.addChildNode(shell)
