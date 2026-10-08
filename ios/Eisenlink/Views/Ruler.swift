@@ -6,6 +6,7 @@ struct Ruler: View {
     @Environment(AppState.self) private var state
     @State private var selID: Int?
     @State private var offset: CGFloat = 0
+    @State private var margin: CGFloat = 0
     private let tw: CGFloat = 62
 
     var body: some View {
@@ -15,7 +16,7 @@ struct Ruler: View {
                     HStack(spacing: 0) {
                         ForEach(Array(list.enumerated()), id: \.element.id) { i, c in
                             Tick(config: c, k: weight(i))
-                                .frame(width: tw, height: 100)
+                                .frame(width: tw, height: 120)
                                 .contentShape(Rectangle())
                                 .onTapGesture { go(c.w) }
                         }
@@ -23,6 +24,8 @@ struct Ruler: View {
                     .scrollTargetLayout()
                 }
                 .contentMargins(.horizontal, max(0, g.size.width / 2 - tw / 2), for: .scrollContent)
+                .onAppear { margin = max(0, g.size.width / 2 - tw / 2) }
+                .onChange(of: g.size.width) { _, w in margin = max(0, w / 2 - tw / 2) }
                 .scrollTargetBehavior(.viewAligned)
                 .scrollPosition(id: $selID, anchor: .center)
                 .onScrollGeometryChange(for: CGFloat.self, of: { $0.contentOffset.x }) { _, new in
@@ -39,11 +42,14 @@ struct Ruler: View {
                     Triangle().fill(Tokens.sel).frame(width: 14, height: 9).padding(.bottom, 2)
                 }
             }
-        .frame(height: 100)
-        .padding(.bottom, 8)
+        .frame(height: 120)
+        .padding(.bottom, 4)
         .onAppear { selID = state.kg }
         .onChange(of: selID) { _, new in
-            if let new, new != state.kg { state.select(new) }
+            if let new, new != state.kg {
+                Haptics.shared.tick()
+                state.select(new)
+            }
         }
         .onChange(of: state.mode) { _, _ in
             var t = Transaction(); t.disablesAnimations = true
@@ -53,7 +59,8 @@ struct Ruler: View {
 
     /// 0 lontano dal centro, 1 al centro (curva morbida).
     private func weight(_ i: Int) -> CGFloat {
-        let d = abs(CGFloat(i) * tw - offset) / tw
+        // contentOffset parte da -margine: il valore i è al centro quando offset + margine = i * tw.
+        let d = abs(CGFloat(i) * tw - (offset + margin)) / tw
         let x = max(0, 1 - d / 1.6)
         return x * x * (3 - 2 * x)
     }

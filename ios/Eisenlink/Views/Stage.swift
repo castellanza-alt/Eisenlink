@@ -8,16 +8,8 @@ struct Stage: View {
     var body: some View {
         let cfg = state.config
         ZStack(alignment: .topLeading) {
-            ZStack(alignment: .bottom) {
-                RadialGradient(colors: [Tokens.floorShadow, .clear],
-                               center: .center, startRadius: 0, endRadius: 90)
-                    .frame(height: 26)
-                    .padding(.horizontal, 56)
-                    .padding(.bottom, 10)
-                    .allowsHitTesting(false)
-                DumbbellView(config: cfg, wide: state.mode == .solo, active: phase == .active)
-            }
-            .padding(.top, 70)
+            DumbbellView(config: cfg, wide: state.mode == .solo, active: phase == .active)
+                .padding(.top, 70)
 
             VStack(alignment: .leading, spacing: 10) {
                 Text("\(cfg.w)")
@@ -44,8 +36,7 @@ struct Stage: View {
                 .animation(.easeOut(duration: 0.2), value: cfg)
                 .allowsHitTesting(false)
         }
-        .frame(maxHeight: .infinity)
-        .frame(minHeight: 300)
+        .frame(minHeight: 300, maxHeight: 400)
     }
 }
 

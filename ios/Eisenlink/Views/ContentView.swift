@@ -2,6 +2,7 @@ import SwiftUI
 
 struct ContentView: View {
     @Environment(AppState.self) private var state
+    @Environment(\.scenePhase) private var scenePhase
 
     var body: some View {
         ZStack {
@@ -10,14 +11,15 @@ struct ContentView: View {
                 Header()
                 Stage()
                 LoadRow(config: state.config)
+                Spacer(minLength: 12)
                 Ruler()
             }
             .padding(.horizontal, 16)
             .padding(.top, 6)
             .frame(maxWidth: 460 + 32)
         }
-        .sensoryFeedback(.selection, trigger: state.kg)
-        .sensoryFeedback(.impact(weight: .light), trigger: state.mode)
+        .onChange(of: scenePhase) { _, new in if new == .active { Haptics.shared.wake() } }
+        .onAppear { Haptics.shared.wake() }
     }
 }
 
@@ -44,6 +46,7 @@ struct Header: View {
         let on = state.mode == m
         return Button {
             guard state.mode != m else { return }
+            Haptics.shared.tick(intensity: 0.9, sharpness: 0.6)
             state.setMode(m)
         } label: {
             Text(title)
