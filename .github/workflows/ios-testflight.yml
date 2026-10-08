@@ -3,6 +3,8 @@ on:
   workflow_dispatch:
   push:
     tags: ["ios-v*"]
+    branches: [ios, ia/dreamy-davinci-vtnbe7]
+    paths: ["ios/RELEASE"]
 jobs:
   testflight:
     runs-on: macos-15

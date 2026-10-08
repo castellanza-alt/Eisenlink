@@ -5,7 +5,7 @@ Il riferimento di comportamento è la web app nella radice del repo (`index.html
 
 - Progetto generato da XcodeGen (`ios/project.yml`); Team ID `5E426PLFWN`, bundle ID `it.castellanza.eisenlink`.
 - Firma automatica con chiave API App Store Connect (nessun certificato nel repo).
-- Workflow: `iOS — verifica` (test unitari su simulatore) e `iOS — Carica su TestFlight` (manuale o tag `ios-v*`).
+- Workflow: `iOS — verifica` (test unitari su simulatore) e `iOS — Carica su TestFlight` (manuale, tag `ios-v*` oppure modifica di `ios/RELEASE` sul ramo).
 
 ## Segreti del repo (Settings → Secrets and variables → Actions)
 
