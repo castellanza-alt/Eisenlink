@@ -78,10 +78,13 @@ private struct Tick: View {
 
     var body: some View {
         VStack(spacing: 10) {
+            // Il numero è disegnato alla dimensione massima e rimpicciolito: ingrandire un testo piccolo lo sfoca.
             Text("\(config.w)")
-                .font(.wide(24)).tracking(-24 * 0.03).monospacedDigit()
+                .font(.wide(46)).tracking(-46 * 0.03).monospacedDigit()
                 .foregroundStyle(k > 0.5 ? Tokens.ink : Tokens.muted)
-                .scaleEffect(1 + 0.9 * k, anchor: .bottom)
+                .fixedSize()
+                .scaleEffect(0.53 + 0.47 * k, anchor: .bottom)
+                .frame(height: 28, alignment: .bottom)
             Capsule()
                 .fill(k > 0.5 ? Tokens.sel : (config.w > Kit.pairMax ? Tokens.mark : Tokens.muted))
                 .frame(width: 3, height: 26)
