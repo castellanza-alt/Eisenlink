@@ -6,7 +6,7 @@ import SwiftUI
 final class AppState {
     private(set) var mode: Mode
     private(set) var kg: Int
-    /// nil = segue il sistema; dopo il primo tocco sull'icona resta la scelta dell'utente.
+    /// Scuro di default; dopo il tocco sull'icona resta la scelta dell'utente.
     private(set) var themeOverride: ColorScheme?
     @ObservationIgnored private let defaults: UserDefaults
 
@@ -19,7 +19,7 @@ final class AppState {
         switch defaults.string(forKey: "el-theme") {
         case "light": themeOverride = .light
         case "dark": themeOverride = .dark
-        default: themeOverride = nil
+        default: themeOverride = .dark   // default scuro; il sistema non conta finché l'utente non sceglie
         }
         normalize()
     }

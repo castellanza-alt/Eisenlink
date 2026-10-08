@@ -44,7 +44,7 @@ struct Ruler: View {
                 }
             }
         .frame(height: 120)
-        .padding(.bottom, 30)
+        .padding(.bottom, 50)
         .onAppear { selID = state.kg }
         .onChange(of: selID) { _, new in
             if let new, new != state.kg {
