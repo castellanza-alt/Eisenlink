@@ -17,8 +17,10 @@ enum Tokens {
     static let line = dyn(0x1B201D, 0xF1F3EF, 0.08, 0.10)
     static let ink = dyn(0x1B201D, 0xF1F3EF)
     static let muted = dyn(0x1B201D, 0xF1F3EF, 0.55, 0.55)
-    static let sel = dyn(0x161B18, 0xBDE955)
-    static let onSel = dyn(0xC6F060, 0x11190A)
+    static let sel = dyn(0x161B18, 0xA3E52F)
+    static let onSel = dyn(0xA3E52F, 0x11190A)
+    /// Verde Eisenlink (campionato dal logo del sito, #A3E52F): scuro per il chiaro, lime per lo scuro.
+    static let accent = dyn(0x5E8F0A, 0xA3E52F)
     static let mark = dyn(0x9A7A3C, 0xB9955A)
     static let floorShadow = dyn(0x1E221C, 0x000000, 0.22, 0.45)
 

@@ -9,7 +9,7 @@ struct Stage: View {
         let cfg = state.config
         ZStack(alignment: .topLeading) {
             DumbbellView(config: cfg, wide: state.mode == .solo, active: phase == .active)
-                .padding(.top, 70)
+                .padding(.top, 90)
 
             VStack(alignment: .leading, spacing: 10) {
                 Text("\(cfg.w)")
@@ -18,7 +18,7 @@ struct Stage: View {
                     .monospacedDigit()
                     .foregroundStyle(Tokens.ink)
                     .frame(height: 100, alignment: .bottom)
-                Text(state.mode.unitLabel).label(10.5, em: 0.16)
+                Text(state.mode.unitLabel).label(12, em: 0.16)
             }
             .padding(.leading, 8)
             .padding(.top, 14)
@@ -26,17 +26,17 @@ struct Stage: View {
             .accessibilityElement(children: .combine)
 
             Text("un manubrio")
-                .label(9.5, em: 0.16, color: Tokens.mark)
+                .label(11, em: 0.16, color: Tokens.mark)
                 .padding(.vertical, 5).padding(.horizontal, 10)
                 .overlay(Capsule().strokeBorder(Tokens.mark, lineWidth: 1))
                 .frame(maxWidth: .infinity, alignment: .topTrailing)
                 .padding(.top, 22)
-                .padding(.trailing, 6)
+                .padding(.trailing, 8)
                 .opacity(state.mode == .solo && Kit.needsExtraKit(cfg) ? 1 : 0)
                 .animation(.easeOut(duration: 0.2), value: cfg)
                 .allowsHitTesting(false)
         }
-        .frame(minHeight: 300, maxHeight: 400)
+        .frame(minHeight: 260, maxHeight: 400)
     }
 }
 
@@ -54,7 +54,7 @@ struct LoadRow: View {
             }
             if config.big == 0 && config.small == 0 {
                 Text("Nessuna piastra, solo maniglia e viti")
-                    .label(10.5, em: 0.12)
+                    .label(12, em: 0.12)
                     .frame(maxWidth: .infinity, minHeight: 60)
                     .background(Tokens.card, in: RoundedRectangle(cornerRadius: 18, style: .continuous))
                     .overlay(RoundedRectangle(cornerRadius: 18, style: .continuous).strokeBorder(Tokens.line, lineWidth: 1))
@@ -71,12 +71,12 @@ struct LoadRow: View {
                 .frame(width: width, height: height)
             VStack(alignment: .leading, spacing: 3) {
                 Text("\(count) \(name)").font(.medium(15)).foregroundStyle(Tokens.ink)
-                Text("\(kg) kg l’una").font(.regular(11.5)).foregroundStyle(Tokens.muted)
+                Text("\(kg) kg l’una").font(.regular(12)).foregroundStyle(Tokens.muted)
             }
             Spacer(minLength: 0)
             Text("×\(count)")
                 .font(.wide(34)).tracking(-34 * 0.03).monospacedDigit()
-                .foregroundStyle(Tokens.ink)
+                .foregroundStyle(Tokens.accent)
         }
         .padding(.horizontal, 14).padding(.vertical, 9)
         .frame(maxWidth: .infinity, minHeight: 60)

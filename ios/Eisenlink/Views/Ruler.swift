@@ -27,6 +27,7 @@ struct Ruler: View {
                 .onAppear { margin = max(0, g.size.width / 2 - tw / 2) }
                 .onChange(of: g.size.width) { _, w in margin = max(0, w / 2 - tw / 2) }
                 .scrollTargetBehavior(.viewAligned)
+                .scrollClipDisabled()
                 .scrollPosition(id: $selID, anchor: .center)
                 .onScrollGeometryChange(for: CGFloat.self, of: { $0.contentOffset.x }) { _, new in
                     offset = new
@@ -39,7 +40,7 @@ struct Ruler: View {
                                    startPoint: .leading, endPoint: .trailing)
                 )
                 .overlay(alignment: .bottom) {
-                    Triangle().fill(Tokens.sel).frame(width: 14, height: 9).padding(.bottom, 2)
+                    Triangle().fill(Tokens.accent).frame(width: 14, height: 9).padding(.bottom, 18)
                 }
             }
         .frame(height: 120)
@@ -85,7 +86,7 @@ private struct Tick: View {
                 .scaleEffect(0.53 + 0.47 * k, anchor: .bottom)
                 .frame(height: 28, alignment: .bottom)
             Capsule()
-                .fill(k > 0.5 ? Tokens.sel : (config.w > Kit.pairMax ? Tokens.mark : Tokens.muted))
+                .fill(k > 0.5 ? Tokens.accent : (config.w > Kit.pairMax ? Tokens.mark : Tokens.muted))
                 .frame(width: 3, height: 26)
                 .scaleEffect(x: 1 + 0.5 * k, y: 1 + 0.7 * k, anchor: .bottom)
                 .opacity(0.5 + 0.5 * k)

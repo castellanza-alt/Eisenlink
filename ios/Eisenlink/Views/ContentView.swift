@@ -30,7 +30,7 @@ struct Header: View {
         HStack {
             Text("Eisenlink")
                 .label(12, em: 0.2, color: Tokens.ink.opacity(0.8))
-                .padding(.leading, 6)
+                .padding(.leading, 8)
             Spacer()
             ThemeButton()
             HStack(spacing: 0) {
@@ -51,9 +51,9 @@ struct Header: View {
             state.setMode(m)
         } label: {
             Text(title)
-                .label(11, em: 0.1, color: on ? Tokens.onSel : Tokens.muted)
-                .padding(.vertical, 8)
+                .label(12, em: 0.1, color: on ? Tokens.onSel : Tokens.muted)
                 .padding(.horizontal, 14)
+                .frame(minHeight: 38)
                 .background(on ? Tokens.sel : .clear, in: Capsule())
         }
         .buttonStyle(.plain)
@@ -74,7 +74,7 @@ struct ThemeButton: View {
             Image(systemName: scheme == .dark ? "sun.max.fill" : "moon.fill")
                 .font(.system(size: 15, weight: .semibold))
                 .foregroundStyle(Tokens.ink)
-                .frame(width: 38, height: 38)
+                .frame(width: 44, height: 44)
                 .background(Tokens.card, in: Circle())
                 .overlay(Circle().strokeBorder(Tokens.line, lineWidth: 1))
                 .contentTransition(.symbolEffect(.replace))
