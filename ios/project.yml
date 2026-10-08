@@ -1,0 +1,56 @@
+name: Eisenlink
+options:
+  deploymentTarget: { iOS: "18.0" }
+  createIntermediateGroups: true
+  bundleIdPrefix: it.castellanza
+settings:
+  base:
+    SWIFT_VERSION: "5.0"
+    DEVELOPMENT_TEAM: 5E426PLFWN
+    CODE_SIGN_STYLE: Automatic
+targets:
+  Eisenlink:
+    type: application
+    platform: iOS
+    sources:
+      - path: Eisenlink
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: it.castellanza.eisenlink
+        PRODUCT_NAME: Eisenlink
+        MARKETING_VERSION: "1.0.0"
+        CURRENT_PROJECT_VERSION: "1"
+        TARGETED_DEVICE_FAMILY: "1"
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
+        GENERATE_INFOPLIST_FILE: NO
+    info:
+      path: Eisenlink/Info.plist
+      properties:
+        CFBundleDisplayName: Eisenlink
+        CFBundleShortVersionString: $(MARKETING_VERSION)
+        CFBundleVersion: $(CURRENT_PROJECT_VERSION)
+        UILaunchScreen: {}
+        UISupportedInterfaceOrientations: [UIInterfaceOrientationPortrait]
+        UIRequiresFullScreen: true
+        ITSAppUsesNonExemptEncryption: false
+        UIAppFonts:
+          - Archivo-SemiExpandedSemiBold.ttf
+          - Archivo-Medium.ttf
+          - Archivo-Regular.ttf
+  EisenlinkTests:
+    type: bundle.unit-test
+    platform: iOS
+    sources: [EisenlinkTests]
+    dependencies:
+      - target: Eisenlink
+    settings:
+      base:
+        GENERATE_INFOPLIST_FILE: YES
+        PRODUCT_BUNDLE_IDENTIFIER: it.castellanza.eisenlink.tests
+schemes:
+  Eisenlink:
+    build:
+      targets:
+        Eisenlink: all
+    test:
+      targets: [EisenlinkTests]

@@ -1,0 +1,81 @@
+name: iOS — Carica su TestFlight
+on:
+  workflow_dispatch:
+  push:
+    tags: ["ios-v*"]
+jobs:
+  testflight:
+    runs-on: macos-15
+    timeout-minutes: 45
+    env:
+      TEAM_ID: 5E426PLFWN
+      BUNDLE_ID: it.castellanza.eisenlink
+    steps:
+      - uses: actions/checkout@v4
+      - name: Seleziona Xcode 26 stabile
+        run: |
+          X=$(ls -d /Applications/Xcode_26*.app 2>/dev/null | grep -v -i -E 'beta|rc' | sort -V | tail -1)
+          [ -n "$X" ] || { echo "Nessun Xcode 26 stabile sul runner"; ls /Applications | grep Xcode; exit 1; }
+          sudo xcode-select -s "$X"
+          xcodebuild -version
+      - run: brew install xcodegen
+      - name: Chiave API App Store Connect (file temporaneo)
+        env:
+          ASC_PRIVATE_KEY: ${{ secrets.ASC_PRIVATE_KEY }}
+          ASC_KEY_ID: ${{ secrets.ASC_KEY_ID }}
+        run: |
+          [ -n "$ASC_PRIVATE_KEY" ] && [ -n "$ASC_KEY_ID" ] || { echo "Mancano i segreti ASC_*"; exit 1; }
+          mkdir -p "$RUNNER_TEMP/asc"
+          KEY="$RUNNER_TEMP/asc/AuthKey_${ASC_KEY_ID}.p8"
+          if printf '%s' "$ASC_PRIVATE_KEY" | grep -q "BEGIN PRIVATE KEY"; then
+            printf '%s\n' "$ASC_PRIVATE_KEY" > "$KEY"
+          else
+            printf '%s' "$ASC_PRIVATE_KEY" | base64 --decode > "$KEY"
+          fi
+          grep -q "BEGIN PRIVATE KEY" "$KEY" || { echo "ASC_PRIVATE_KEY non è un .p8 valido"; exit 1; }
+          echo "ASC_KEY_PATH=$KEY" >> "$GITHUB_ENV"
+      - name: Genera progetto
+        working-directory: ios
+        run: xcodegen generate
+      - name: Archivio (firma automatica con la chiave API)
+        working-directory: ios
+        env:
+          ASC_KEY_ID: ${{ secrets.ASC_KEY_ID }}
+          ASC_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
+        run: |
+          xcodebuild archive -project Eisenlink.xcodeproj -scheme Eisenlink \
+            -configuration Release -destination 'generic/platform=iOS' \
+            -archivePath "$RUNNER_TEMP/Eisenlink.xcarchive" \
+            -allowProvisioningUpdates \
+            -authenticationKeyPath "$ASC_KEY_PATH" \
+            -authenticationKeyID "$ASC_KEY_ID" \
+            -authenticationKeyIssuerID "$ASC_ISSUER_ID" \
+            DEVELOPMENT_TEAM="$TEAM_ID" CODE_SIGN_STYLE=Automatic \
+            CURRENT_PROJECT_VERSION="${{ github.run_number }}" | tail -40
+          test -d "$RUNNER_TEMP/Eisenlink.xcarchive"
+      - name: Esporta e carica su TestFlight
+        working-directory: ios
+        env:
+          ASC_KEY_ID: ${{ secrets.ASC_KEY_ID }}
+          ASC_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
+        run: |
+          cat > "$RUNNER_TEMP/ExportOptions.plist" <<PLIST
+          <?xml version="1.0" encoding="UTF-8"?>
+          <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+          <plist version="1.0"><dict>
+            <key>method</key><string>app-store-connect</string>
+            <key>destination</key><string>upload</string>
+            <key>teamID</key><string>${TEAM_ID}</string>
+            <key>signingStyle</key><string>automatic</string>
+            <key>uploadSymbols</key><true/>
+          </dict></plist>
+          PLIST
+          xcodebuild -exportArchive -archivePath "$RUNNER_TEMP/Eisenlink.xcarchive" \
+            -exportOptionsPlist "$RUNNER_TEMP/ExportOptions.plist" \
+            -allowProvisioningUpdates \
+            -authenticationKeyPath "$ASC_KEY_PATH" \
+            -authenticationKeyID "$ASC_KEY_ID" \
+            -authenticationKeyIssuerID "$ASC_ISSUER_ID" | tail -40
+      - name: Pulizia chiave
+        if: always()
+        run: rm -rf "$RUNNER_TEMP/asc"
