@@ -1,7 +1,7 @@
 import SwiftUI
 
 /// Righello orizzontale: scorri e il peso cambia mentre passi sui valori.
-/// Lo scorrimento è quello nativo (inerzia e aggancio di sistema); il numero sotto il dito si ingrandisce in modo continuo.
+/// Si cambia peso solo con lo swipe, con un clic aptico per ogni valore. Lo scorrimento è quello nativo (inerzia e aggancio di sistema); il numero sotto il dito si ingrandisce in modo continuo.
 struct Ruler: View {
     @Environment(AppState.self) private var state
     @State private var selID: Int?
@@ -10,9 +10,7 @@ struct Ruler: View {
 
     var body: some View {
         let list = state.mode.configs
-        HStack(spacing: 0) {
-            StepButton(symbol: "minus", label: "Meno 2 kg") { move(-1) }
-            GeometryReader { g in
+        GeometryReader { g in
                 ScrollView(.horizontal, showsIndicators: false) {
                     HStack(spacing: 0) {
                         ForEach(Array(list.enumerated()), id: \.element.id) { i, c in
@@ -41,9 +39,8 @@ struct Ruler: View {
                     Triangle().fill(Tokens.sel).frame(width: 14, height: 9).padding(.bottom, 2)
                 }
             }
-            .frame(height: 100)
-            StepButton(symbol: "plus", label: "Più 2 kg") { move(1) }
-        }
+        .frame(height: 100)
+        .padding(.bottom, 8)
         .onAppear { selID = state.kg }
         .onChange(of: selID) { _, new in
             if let new, new != state.kg { state.select(new) }
@@ -65,11 +62,6 @@ struct Ruler: View {
         withAnimation(.snappy(duration: 0.28)) { selID = w }
     }
 
-    private func move(_ d: Int) {
-        let list = state.mode.configs
-        guard let i = list.firstIndex(where: { $0.w == state.kg }) else { return }
-        go(list[max(0, min(list.count - 1, i + d))].w)
-    }
 }
 
 private struct Tick: View {
@@ -99,34 +91,6 @@ private struct Tick: View {
     }
 }
 
-private struct StepButton: View {
-    let symbol: String
-    let label: String
-    let action: () -> Void
-
-    var body: some View {
-        Button(action: action) {
-            Image(systemName: symbol)
-                .font(.system(size: 22, weight: .semibold))
-                .foregroundStyle(Tokens.ink)
-                .frame(width: 58, height: 58)
-                .background(Tokens.card, in: Circle())
-                .overlay(Circle().strokeBorder(Tokens.line, lineWidth: 1))
-        }
-        .buttonStyle(PressScale())
-        .padding(.bottom, 24)
-        .accessibilityLabel(label)
-    }
-}
-
-private struct PressScale: ButtonStyle {
-    @Environment(\.accessibilityReduceMotion) private var reduce
-    func makeBody(configuration: Configuration) -> some View {
-        configuration.label
-            .scaleEffect(configuration.isPressed && !reduce ? 0.94 : 1)
-            .animation(reduce ? nil : .easeOut(duration: 0.12), value: configuration.isPressed)
-    }
-}
 
 private struct Triangle: Shape {
     func path(in r: CGRect) -> Path {

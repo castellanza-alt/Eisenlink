@@ -54,7 +54,7 @@ struct LoadRow: View {
     let config: Config
 
     var body: some View {
-        HStack(spacing: 10) {
+        VStack(spacing: 8) {
             if config.big > 0 {
                 card(width: 14, height: 42, count: config.big, name: config.big == 1 ? "Grande" : "Grandi", kg: 2)
             }
@@ -64,12 +64,13 @@ struct LoadRow: View {
             if config.big == 0 && config.small == 0 {
                 Text("Nessuna piastra, solo maniglia e viti")
                     .label(10.5, em: 0.12)
-                    .frame(maxWidth: .infinity, minHeight: 66)
+                    .frame(maxWidth: .infinity, minHeight: 60)
                     .background(Tokens.card, in: RoundedRectangle(cornerRadius: 18, style: .continuous))
                     .overlay(RoundedRectangle(cornerRadius: 18, style: .continuous).strokeBorder(Tokens.line, lineWidth: 1))
             }
         }
-        .frame(minHeight: 66)
+        // Altezza fissa per due riquadri: il manubrio non cambia dimensione da un peso all'altro.
+        .frame(maxWidth: .infinity, minHeight: 128, alignment: .top)
         .animation(.easeOut(duration: 0.18), value: config)
     }
 
@@ -86,8 +87,8 @@ struct LoadRow: View {
                 .font(.wide(34)).tracking(-34 * 0.03).monospacedDigit()
                 .foregroundStyle(Tokens.ink)
         }
-        .padding(.horizontal, 14).padding(.vertical, 11)
-        .frame(maxWidth: .infinity, minHeight: 66)
+        .padding(.horizontal, 14).padding(.vertical, 9)
+        .frame(maxWidth: .infinity, minHeight: 60)
         .background(Tokens.card, in: RoundedRectangle(cornerRadius: 18, style: .continuous))
         .overlay(RoundedRectangle(cornerRadius: 18, style: .continuous).strokeBorder(Tokens.line, lineWidth: 1))
         .accessibilityElement(children: .combine)
