@@ -1,10 +1,13 @@
 import Foundation
 import Observation
+import SwiftUI
 
 @Observable
 final class AppState {
     private(set) var mode: Mode
     private(set) var kg: Int
+    /// nil = segue il sistema; dopo il primo tocco sull'icona resta la scelta dell'utente.
+    private(set) var themeOverride: ColorScheme?
     @ObservationIgnored private let defaults: UserDefaults
 
     init(defaults: UserDefaults = .standard) {
@@ -13,10 +16,20 @@ final class AppState {
         let stored = defaults.integer(forKey: "el-kg")
         mode = m
         kg = stored == 0 ? 10 : stored
+        switch defaults.string(forKey: "el-theme") {
+        case "light": themeOverride = .light
+        case "dark": themeOverride = .dark
+        default: themeOverride = nil
+        }
         normalize()
     }
 
     var config: Config { mode.configs.first { $0.w == kg } ?? mode.configs[3] }
+
+    func setTheme(_ scheme: ColorScheme) {
+        themeOverride = scheme
+        defaults.set(scheme == .dark ? "dark" : "light", forKey: "el-theme")
+    }
 
     func select(_ w: Int) { kg = w; save() }
     func setMode(_ m: Mode) { mode = m; normalize(); save() }

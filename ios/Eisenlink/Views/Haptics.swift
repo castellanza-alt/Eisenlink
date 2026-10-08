@@ -21,22 +21,6 @@ final class Haptics {
         }
     }
 
-    /// Prova: vibrazione continua di 0,3 s più un clic. Si attiva toccando la scritta «Eisenlink».
-    func test() {
-        if let e = engine {
-            do {
-                try e.start()
-                let ev = CHHapticEvent(eventType: .hapticContinuous,
-                                       parameters: [CHHapticEventParameter(parameterID: .hapticIntensity, value: 1),
-                                                    CHHapticEventParameter(parameterID: .hapticSharpness, value: 0.5)],
-                                       relativeTime: 0, duration: 0.3)
-                let player = try e.makePlayer(with: try CHHapticPattern(events: [ev], parameters: []))
-                try player.start(atTime: CHHapticTimeImmediate)
-            } catch {}
-        }
-        UINotificationFeedbackGenerator().notificationOccurred(.success)
-    }
-
     /// Da chiamare quando l'app torna in primo piano: il motore si ferma in background.
     func wake() {
         try? engine?.start()

@@ -8,6 +8,7 @@ struct EisenlinkApp: App {
         WindowGroup {
             ContentView()
                 .environment(state)
+                .preferredColorScheme(state.themeOverride)
         }
     }
 }
