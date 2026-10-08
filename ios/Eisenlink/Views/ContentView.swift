@@ -31,6 +31,7 @@ struct Header: View {
             Text("Eisenlink")
                 .label(12, em: 0.2, color: Tokens.ink.opacity(0.8))
                 .padding(.leading, 6)
+                .onTapGesture { Haptics.shared.test() }
             Spacer()
             HStack(spacing: 0) {
                 seg("Coppia", .pair)
