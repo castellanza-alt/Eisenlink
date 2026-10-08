@@ -36,6 +36,31 @@ jobs:
           fi
           grep -q "BEGIN PRIVATE KEY" "$KEY" || { echo "ASC_PRIVATE_KEY non è un .p8 valido"; exit 1; }
           echo "ASC_KEY_PATH=$KEY" >> "$GITHUB_ENV"
+      - name: Verifica chiave API (nessun valore stampato)
+        env:
+          ASC_KEY_ID: ${{ secrets.ASC_KEY_ID }}
+          ASC_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
+        run: |
+          KID=$(printf '%s' "$ASC_KEY_ID" | tr -d '[:space:]')
+          ISS=$(printf '%s' "$ASC_ISSUER_ID" | tr -d '[:space:]')
+          echo "Key ID: lunghezza ${#KID} (attesa 10), formato valido: $(printf '%s' "$KID" | grep -Ec '^[A-Z0-9]{10}$')"
+          echo "Issuer ID: lunghezza ${#ISS} (attesa 36), formato UUID valido: $(printf '%s' "$ISS" | grep -Ec '^[0-9a-fA-F-]{36}$')"
+          echo "Chiave: righe nel file $(wc -l < "$ASC_KEY_PATH"), parse EC: $(openssl pkey -in "$ASC_KEY_PATH" -noout 2>&1 && echo ok || echo ERRORE)"
+          b64() { openssl base64 -A | tr '+/' '-_' | tr -d '='; }
+          NOW=$(date +%s)
+          H=$(printf '{"alg":"ES256","kid":"%s","typ":"JWT"}' "$KID" | b64)
+          P=$(printf '{"iss":"%s","iat":%s,"exp":%s,"aud":"appstoreconnect-v1"}' "$ISS" "$NOW" "$((NOW+600))" | b64)
+          # firma ES256: da DER a r||s a 64 byte
+          SIG=$(printf '%s.%s' "$H" "$P" | openssl dgst -sha256 -sign "$ASC_KEY_PATH" | python3 -c '
+          import sys
+          d=sys.stdin.buffer.read()
+          i=3 if d[1]&0x80==0 else 4
+          rl=d[i]; r=d[i+1:i+1+rl]; j=i+1+rl+1; sl=d[j]; s=d[j+1:j+1+sl]
+          r=r.lstrip(b"\x00").rjust(32,b"\x00"); s=s.lstrip(b"\x00").rjust(32,b"\x00")
+          sys.stdout.buffer.write(r+s)' | b64)
+          CODE=$(curl -s -o "$RUNNER_TEMP/asc/resp.json" -w '%{http_code}' -H "Authorization: Bearer $H.$P.$SIG" "https://api.appstoreconnect.apple.com/v1/apps?filter%5BbundleId%5D=$BUNDLE_ID")
+          echo "API App Store Connect: HTTP $CODE"
+          python3 -c 'import json,sys; d=json.load(open(sys.argv[1])); print("apps trovate:", len(d.get("data",[])) if "data" in d else [e.get("code") for e in d.get("errors",[])])' "$RUNNER_TEMP/asc/resp.json" || true
       - name: Genera progetto
         working-directory: ios
         run: xcodegen generate
